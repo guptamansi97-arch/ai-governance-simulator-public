@@ -99,6 +99,70 @@ def compute_risk_breakdown(round3_results, round1_results=None):
     return breakdown
 
 
+def compute_baseline_decision(round2_analysis, alignment_score, risk_appetite):
+    """
+    Determines baseline executive decision from Round 2 positions before the stress test.
+    Stage 1: Reinforced Hard Risk Gate (requires second high risk signal or multiple shifts)
+    Stage 2: Metric Score with Pilot Mitigation (-10 points for pilot consensus)
+    Stage 3: Decision Mapping (Proceed < 30, Conditional 30-80, No-Go > 80)
+    """
+    if not round2_analysis or "agent_stances" not in round2_analysis:
+        return {"decision": "Unknown", "conditions": []}
+
+    conditions = []
+    pilot_mitigation = 0
+    agent_stances = round2_analysis["agent_stances"]
+    
+    # Stage 1: Reinforced Hard Risk Gate
+    baseline_risks = [agent.get("risk_level", "Moderate") for agent in agent_stances.values()]
+    has_very_high = any(r == "Very High" for r in baseline_risks)
+    high_or_above_count = sum(1 for r in baseline_risks if r in ["High", "Very High"])
+    
+    no_go_count = sum(1 for agent in agent_stances.values() if agent.get("decision") == "No-Go")
+
+    if (has_very_high and high_or_above_count >= 2) or no_go_count >= 2:
+        return {"decision": "Do Not Proceed", "conditions": []}
+
+    # Stage 2: Pilot Detection & Score Mitigation
+    pilot_count = sum(1 for data in agent_stances.values() if data.get("decision") == "Pilot")
+    if pilot_count >= 2:
+        pilot_mitigation = -10 # Pilot acts as a risk reducer
+        conditions.append("Pilot deployment required before full rollout.")
+
+    # Stage 3: Score-Based Decision Calculation
+    risks = [risk_to_number(r) for r in baseline_risks]
+    avg_risk_val = sum(risks) / len(risks) if len(risks) > 0 else 2.0
+    risk_score = (avg_risk_val - 1) / 3 * 100 
+
+    # We exclude fragility index from baseline decision calculation
+    weighted_score = (0.6 * risk_score) + (0.4 * (100 - alignment_score))
+
+    threshold_mod = 0
+    if risk_appetite == "Low":
+        threshold_mod = 10
+    elif risk_appetite == "High":
+        threshold_mod = -15
+
+    # Final Score with Pilot Mitigation and Appetite modifier
+    final_score = weighted_score + threshold_mod + pilot_mitigation
+    
+    if final_score < 30:
+        decision = "Proceed"
+    elif final_score <= 80:
+        decision = "Conditional Proceed"
+    else:
+        decision = "Do Not Proceed"
+
+    # Ensure Pilot recommendations force "Conditional Proceed" if they aren't already a "Do Not Proceed"
+    if "Pilot deployment required before full rollout." in conditions and decision == "Proceed":
+        decision = "Conditional Proceed"
+
+    return {
+        "decision": decision,
+        "conditions": conditions
+    }
+
+
 def compute_decision(round3_results, alignment_score, fragility_index, risk_appetite, round2_analysis=None):
     """
     Determines final executive decision using a three-stage calibration model.

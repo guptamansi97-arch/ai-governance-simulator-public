@@ -29,13 +29,15 @@ Orchestrates a multi-round stress test:
 1.  **Baseline Evaluation**: Independent risk assessments.
 2.  **Executive Debate**: High-friction cross-functional discussion.
 3.  **Debate Analysis**: Structured extraction of stances, decisions, and coalitions.
-4.  **Shock Injection**: Resilience testing against tag-matched external stressors.
-5.  **Analytics**: Weighted scoring using a three-stage decision model (Risk Gate, Weighted Score, Rollout Conditions).
+4.  **Baseline Decision**: Committee consensus derived post-debate.
+5.  **Shock Injection**: Resilience testing against tag-matched external stressors.
+6.  **Analytics**: Weighted scoring using a three-stage decision model to calculate the **Post-Stress Decision**.
 
-- **Decision Signal**: A final "Proceed," "Conditional Proceed," or "Do Not Proceed" recommendation. Rejections are reserved for major risk polarization, while pilot recommendations act as professional mitigations.
+- **Strategic Signals**: Dual decision monitoring ("Baseline" vs "Post-Stress"). Rejections are reserved for major risk polarization, while pilot recommendations act as professional mitigations.
 
 ## Strategic Metrics
 The system translates complex semantic debates into quantifiable executive metrics:
+- **Baseline vs. Post-Stress Stance**: Tracking decision stability across shocks.
 - **Final Consensus**: Qualitative convergence level (Low, Moderate, High).
 - **Alignment Score**: Quantitative measure (0-100) of risk level consensus.
 - **Fragility Index**: Measures sensitivity to unexpected operational stress.

@@ -44,15 +44,27 @@ Organizes post-shock agent risk assessments by organizational domain.
 
 ---
 
-## 3. Decision Recommendation
-Determines the final executive stance using a two-stage evaluation model.
+## 3. Decision Recommendations
+The simulator issues two distinct decisions to provide a comprehensive view of initiative stability.
 
-### Stage 1: Reinforced Hard Risk Gate (Mandatory Disqualifiers)
-The simulator immediately issues a **Do Not Proceed** recommendation only in cases of severe governance failure:
+### Baseline Decision
+- **Source**: `compute_baseline_decision` logic.
+- **Data Input**: Round 2 Analysis (post-debate stances).
+- **Purpose**: Reflects the executive committee's consensus prior to any external shock.
+- **Logic**: Use a two-stage model (Hard Risk Gate + Weighted Score) without the fragility index.
+
+### Post-Stress Decision
+- **Source**: `compute_decision` logic.
+- **Data Input**: Round 3 results (post-shock re-evaluations).
+- **Purpose**: Reflects whether the initial decision remains viable after a strategic shock.
+- **Logic**: A three-stage evaluation model that incorporates fragility and alignment shifts.
+
+#### Stage 1: Reinforced Hard Risk Gate (Mandatory Disqualifiers)
+The simulator issues a **Do Not Proceed** recommendation in cases of severe resilience failure:
 - **Major Risk Polarization**: **Any** agent reports **"Very High"** risk AND **at least one other** agent reports **"High"** risk or above post-shock.
 - **Structural Collapse**: **Two or more** agents shift their position to **"Becomes No-Go"** after the stress test.
 
-### Stage 2: Calibrated Score-Based Decision
+#### Stage 2: Calibrated Score-Based Decision
 If the disqualifiers are not met, a weighted score is calculated:
 `Score = 0.4 × AvgRisk + 0.3 × Fragility + 0.3 × AlignmentPenalty`
 
@@ -62,9 +74,9 @@ If the disqualifiers are not met, a weighted score is calculated:
 | Score | Outcome | Description |
 | :--- | :--- | :--- |
 | < 30 | **Proceed** | Strong alignment and resilience. |
-| 30 – 80 | **Conditional Proceed** | Most realistic outcome; requires specific mitigations or pilot. |
+| 30 – 80 | **Conditional Proceed** | Requires specific mitigations or pilot. |
 | > 80 | **Do Not Proceed** | Extreme risk trajectory or structural collapse. |
 
-### Stage 3: Rollout Strategy (Pilot Extraction)
-The simulator deterministicially extracts conditions from the **Round 2 Analysis**.
-- **Pilot Condition**: If **two or more agents** recommend a "Pilot" during the debate, the decision is flagged as **Conditional Proceed** (unless a Stage 1 rejection occurs), and a mandatory condition is added: *"Pilot deployment required before full rollout."*
+#### Stage 3: Rollout Strategy (Pilot Extraction)
+The simulator deterministically extracts conditions from the **Round 2 Analysis**.
+- **Pilot Condition**: If **two or more agents** recommend a "Pilot" during the debate, the decision is flagged as **Conditional Proceed** (unless a Stage 1/2 rejection occurs), and a mandatory condition is added: *"Pilot deployment required before full rollout."*

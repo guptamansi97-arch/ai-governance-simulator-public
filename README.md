@@ -46,14 +46,14 @@ Detailed guides for different aspects of the system:
 - [Configuration Guide](config.md) - How to customize inputs and parameters.
 
 ## 🛠️ Project Structure
-- `engine.py`: Central simulation orchestration engine.
-- `ui.py`: Streamlit-based executive dashboard with live debate rendering and **Pilot outcome** support.
+- `engine.py`: Central simulation orchestration engine; computes Baseline and Post-Stress decisions.
+- `ui.py`: Streamlit-based executive dashboard with live debate rendering and **Dual-Decision** monitoring.
 - `main.py`: CLI entry point.
 - `simulation.py`: Bulk and sequential round-based reasoning logic including **Tag-based Shock Selection**.
+- `metrics.py`: Two-phase decision logic (`compute_baseline_decision` and `compute_decision`).
 - `registry/shocks.json`: Centralized, tag-aware repository of negative stress scenarios.
 - `agent_registry.py`: Canonical registry for dynamic agent personas and domains.
 - `agents.py`: LLM agent interaction layer supporting bulk calls.
-- `metrics.py`: Three-stage decision logic (Hard Risk Gate + Weighted Scoring + Rollout Conditions).
-- `utils.py`: Deterministic tag extraction and text cleaning helpers.
-- `prompts.py`: Dynamic prompt templates for bulk and focal-led reasoning.
+- `utils.py`: Deterministic tag extraction, text cleaning, and state compression helpers.
+- `prompts.py`: Dynamic prompt templates for bulk, focal-led, and analysis rounds.
 - `outputs/`: Directory containing all simulation logs and indices.
