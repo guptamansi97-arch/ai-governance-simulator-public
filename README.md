@@ -2,6 +2,10 @@
 
 A professional strategic tool for simulating multi-agent board-level debates on AI initiatives to evaluate risk, alignment, and fragility.
 
+## 📁 Repository Structure
+This repository contains the documentation and core logic files for the simulation. 
+The full implementation, including LLM agent interaction layer, prompt engineering, UI, and configuration, is maintained in a private repository.
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -53,4 +57,3 @@ Detailed guides for different aspects of the system:
 - `utils.py`: Deterministic tag extraction and text cleaning helpers.
 - `prompts.py`: Dynamic prompt templates for bulk and focal-led reasoning.
 - `outputs/`: Directory containing all simulation logs and indices.
-
