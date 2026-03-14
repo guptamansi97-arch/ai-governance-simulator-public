@@ -1,6 +1,6 @@
 import json
 import os
-from agents import run_agent, run_bulk_agents, run_round2_analysis
+from agents import run_bulk_agents, run_round2_analysis, run_round2_planning, run_debate_segment
 from agent_registry import AGENTS
 from prompts import ROUND1_INSTRUCTION, DEBATE_ROUND2_INSTRUCTION, BULK_ROUND3_INSTRUCTION
 from utils import summarize_round, select_relevant_shock
@@ -33,29 +33,82 @@ def run_round1(model, initiative, on_agent_complete=None):
 
 def run_round2(model, initiative, round1_results, on_agent_complete=None):
     """
-    Round 2: Sequential debate led by each agent in registry.
+    Round 2: Risk-agenda-driven debate.
+
+    Flow:
+      1. Planning call  — assigns each agent one unique risk, ranks by severity.
+      2. Debate calls   — one per ranked risk; only domain-relevant agents speak.
+
+    Returns a flat list of { speaker, message, risk_topic } dicts, fully
+    compatible with perform_round2_analysis and the UI rendering layer.
     """
+
     conversation_history = []
-    
-    # Dynamic: Iterate through all agents in registry
-    for focal_agent in AGENTS.keys():
-        context = {
-            "initiative": initiative,
-            "round1_summary": summarize_round(round1_results),
-            "conversation_history": conversation_history,
-            "focal_agent": focal_agent
+    round1_summary = summarize_round(round1_results)
+
+    # ── Step 1: Build the debate agenda ──────────────────────────────────────
+    agenda_result = run_round2_planning(model, AGENTS, round1_results, initiative)
+    agenda = agenda_result.get("agenda", [])
+
+    # Fallback: if planning call returns empty, construct a minimal agenda
+    # so the simulation never silently skips Round 2.
+    if not agenda:
+        agenda = [
+            {
+                "rank": i + 1,
+                "severity": "Moderate",
+                "risk": f"Key governance concern raised by {agent} in Round 1",
+                "owner": agent,
+                "flagged_by": agent,
+                "eligible_interjectors": []
+            }
+            for i, agent in enumerate(AGENTS.keys())
+        ]
+
+    # ── Step 2: One focused debate call per agenda item ───────────────────────
+    for item in agenda:
+        owner        = item["owner"]
+        flagged_by   = item["flagged_by"]
+        interjectors = item.get("eligible_interjectors", [])
+        risk_topic   = item["risk"]
+        severity     = item.get("severity", "Moderate")
+
+        # Ordered, deduplicated participant list: owner → flagged_by → interjectors
+        participants = list(dict.fromkeys([owner, flagged_by] + interjectors))
+
+        # Full persona text for every participant, injected as top-level prompt
+        # blocks inside run_debate_segment (not buried in JSON).
+        participant_personas = {
+            name: AGENTS[name]["persona"]
+            for name in participants
+            if name in AGENTS
         }
-        
-        # Focal agent leads a multi-turn sub-session
-        responses = run_agent(model, AGENTS[focal_agent]["persona"], DEBATE_ROUND2_INSTRUCTION, context)
-        
-        # Responses is a list of messages [ {speaker, message}, ... ]
+
+        segment = {
+            "risk_topic": risk_topic,
+            "severity": severity,
+            "owner": owner,
+            "flagged_by": flagged_by,
+            "eligible_interjectors": interjectors,
+            "participant_personas": participant_personas
+        }
+
+        responses = run_debate_segment(
+            model,
+            segment,
+            conversation_history,   
+            round1_summary,
+            initiative
+        )
+
         if isinstance(responses, list):
             for msg in responses:
+                # Tag each message with its source risk for optional UI grouping
+                msg["risk_topic"] = risk_topic
                 conversation_history.append(msg)
                 if on_agent_complete:
-                    on_agent_complete("round2", msg.get("speaker", focal_agent), msg)
-                    
+                    on_agent_complete("round2", msg.get("speaker", owner), msg)
+
     return conversation_history
 
 def perform_round2_analysis(model, conversation_history, round1_results=None):
@@ -97,4 +150,4 @@ def run_round3(model, initiative, round2_analysis, on_agent_complete=None):
             if agent_name in results:
                 on_agent_complete("round3", agent_name, results[agent_name])
             
-    return results, selected_shock_obj
+    return results, selected_shock_obj

@@ -49,11 +49,11 @@ Detailed guides for different aspects of the system:
 - `engine.py`: Central simulation orchestration engine; computes Baseline and Post-Stress decisions.
 - `ui.py`: Streamlit-based executive dashboard with live debate rendering and **Dual-Decision** monitoring.
 - `main.py`: CLI entry point.
-- `simulation.py`: Bulk and sequential round-based reasoning logic including **Tag-based Shock Selection**.
-- `metrics.py`: Two-phase decision logic (`compute_baseline_decision` and `compute_decision`).
+- `simulation.py`: Bulk and sequential round-based reasoning logic including **Risk-Agenda Planning** and **Tag-based Shock Selection**.
+- `metrics.py`: Two-phase decision logic (`compute_baseline_decision` and `compute_decision`) incorporating fragility and domain-weighted scoring.
 - `registry/shocks.json`: Centralized, tag-aware repository of negative stress scenarios.
 - `agent_registry.py`: Canonical registry for dynamic agent personas and domains.
-- `agents.py`: LLM agent interaction layer supporting bulk calls.
+- `agents.py`: LLM agent interaction layer supporting bulk calls and segmented debate generation.
 - `utils.py`: Deterministic tag extraction, text cleaning, and state compression helpers.
-- `prompts.py`: Dynamic prompt templates for bulk, focal-led, and analysis rounds.
+- `prompts.py`: Dynamic prompt templates for bulk rounds, agenda planning, and segmented debate.
 - `outputs/`: Directory containing all simulation logs and indices.

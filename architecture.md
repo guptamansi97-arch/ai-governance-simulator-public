@@ -16,7 +16,7 @@ The `SimulationEngine` is the heart of the system. It manages:
 This layer handles the multi-agent debate logic.
 - **Dynamic Agents**: Supports any number of agents defined in `agent_registry.py`.
 - **Bulk Evaluation**: Rounds 1 and 3 use single LLM calls to evaluate all agents simultaneously for efficiency.
-- **Sequential Debate**: Round 2 implements a focal-led conversation history where agents interact progressively.
+- **Risk-Agenda-Driven Debate**: Round 2 uses a two-step planning and segmented execution model. It pre-assigns unique risk topics to "owners" and manages domain-gated interjections.
 
 ### 3. Analytics & Scoring (`metrics.py`)
 Handles deterministic processing of the qualitative agent outputs:

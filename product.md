@@ -18,8 +18,8 @@ The system dynamically adapts to any number of registered agents, such as:
 ### Round 1: Independent Baseline (Bulk)
 All agents perform an initial, "blind" evaluation of the initiative simultaneously. This establishes a baseline of independent professional bias.
 
-### Round 2: Focal-Led Debate (Sequential)
-Agents enter a structured conversation where each agent leads a debate session. They respond to peer concerns and previous arguments, leading to either consensus-building or the hardening of critical oppositions.
+### Round 2: Risk-Agenda-Driven Debate (Sequential)
+Agents enter a structured debate where the agenda is pre-planned based on Round 1 risks. Each segment is led by a pre-assigned "owner" and challenged by domain-relevant "interjectors", ensuring a non-repetitive and high-friction consensus-building process.
 
 ### Round 3: Shock Injection (Bulk)
 A significant operational constraint (shock) is applied based on initiative tags and industry relevance. All agents reassess the initiative’s resilience, exposing hidden vulnerabilities.
