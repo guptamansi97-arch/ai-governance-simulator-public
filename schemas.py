@@ -24,6 +24,7 @@ ROUND1_SCHEMA = {
     "risk_level": "Low | Moderate | High",
     "confidence": "integer (0-100)",
     "primary_concerns": ["string"],
+    "grounding_references": ["string"],
     "stance_summary": "string"
 }
 
@@ -51,6 +52,7 @@ ROUND3_SCHEMA = {
     "risk_level_after_shock": "Low | Moderate | High | Very High",
     "confidence": "integer (0-100)",
     "vulnerability_exposed": "string",
+    "grounding_references": ["string"],
     "decision_change": "No Change | Becomes Conditional | Becomes No-Go"
 }
 
